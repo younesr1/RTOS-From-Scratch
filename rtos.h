@@ -28,6 +28,6 @@ bool rtos_create_task(tid_t *thread_id, uint8_t priority, rtos_task_func_t task,
 /**
  * @brief Yields to other tasks
  */
-void rtos_task_yield(tid_t id); // this link has the code https://mcuoneclipse.com/2016/08/28/arm-cortex-m-interrupts-and-freertos-part-3/#:~:text=PendSV%20(Pendable%20SerVice)%20is%20an,FreeRTOS%20to%20start%20the%20scheduler.
+//void rtos_task_yield(tid_t id); // this link has the code https://mcuoneclipse.com/2016/08/28/arm-cortex-m-interrupts-and-freertos-part-3/#:~:text=PendSV%20(Pendable%20SerVice)%20is%20an,FreeRTOS%20to%20start%20the%20scheduler.
 
 #endif

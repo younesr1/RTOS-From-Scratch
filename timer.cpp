@@ -16,5 +16,12 @@ uint32_t timer_get_time()
 /* SysTick interrupt Handler. */
 void SysTick_Handler(void)
 {
+    /* Must disable interrupts since non re-entrant */
+    __disable_irq();
     msTicks++;
+    if (msTicks % 100 == 0)
+    {
+        SCB->ICSR = 0x1 << 28;
+    }
+    __enable_irq();
 }
