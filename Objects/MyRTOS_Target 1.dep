@@ -1,6 +1,5 @@
 Dependencies for Project 'MyRTOS', Target 'Target 1': (DO NOT MODIFY !)
 CompilerVersion: 6150000::V6.15::ARMCLANG
-F (.\main_default.c)(0x6068FFF0)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Weverything -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/LPC1768-I./RTE/_Target_1-IC:/Users/16479/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0/CMSIS/Core/Include-IC:/Users/16479/AppData/Local/Arm/Packs/Keil/LPC1700_DFP/2.6.0/Device/Include-D__UVISION_VERSION="533" -D_RTE_ -DLPC175x_6x -D_RTE_ -D__RTGT_UART-o ./objects/main_default.o -MD)
 F (.\Retarget.c)(0x6068F898)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Weverything -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/LPC1768-I./RTE/_Target_1-IC:/Users/16479/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0/CMSIS/Core/Include-IC:/Users/16479/AppData/Local/Arm/Packs/Keil/LPC1700_DFP/2.6.0/Device/Include-D__UVISION_VERSION="533" -D_RTE_ -DLPC175x_6x -D_RTE_ -D__RTGT_UART-o ./objects/retarget.o -MD)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdio.h)(0x5F377974)
 I (C:\Keil_v5\ARM\ARMCLANG\include\rt_misc.h)(0x5F377972)
@@ -21,7 +20,7 @@ I (C:\Users\16479\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.6.0\Device\Include\
 I (uart.h)(0x6068F898)
 F (.\uart.h)(0x6068F898)()
 F (.\rtos.h)(0x60690119)()
-F (.\rtos.c)(0x6069013E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Weverything -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/LPC1768-I./RTE/_Target_1-IC:/Users/16479/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0/CMSIS/Core/Include-IC:/Users/16479/AppData/Local/Arm/Packs/Keil/LPC1700_DFP/2.6.0/Device/Include-D__UVISION_VERSION="533" -D_RTE_ -DLPC175x_6x -D_RTE_ -D__RTGT_UART-o ./objects/rtos.o -MD)
+F (.\rtos.c)(0x606909D9)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Weverything -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/LPC1768-I./RTE/_Target_1-IC:/Users/16479/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0/CMSIS/Core/Include-IC:/Users/16479/AppData/Local/Arm/Packs/Keil/LPC1700_DFP/2.6.0/Device/Include-D__UVISION_VERSION="533" -D_RTE_ -DLPC175x_6x -D_RTE_ -D__RTGT_UART-o ./objects/rtos.o -MD)
 I (rtos.h)(0x60690119)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x5F37796C)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x5F377968)
