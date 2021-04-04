@@ -21,6 +21,7 @@ void SysTick_Handler(void)
     msTicks++;
     if (msTicks % 100 == 0)
     {
+			// younes todo call fpp here. maybe move this function to rtos.c
         SCB->ICSR = 0x1 << 28;
     }
     __enable_irq();

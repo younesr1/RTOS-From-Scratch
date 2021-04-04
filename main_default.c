@@ -1,3 +1,4 @@
+#if false
 /*
  * Default main.c for rtos lab.
  * @author Andrew Morton, 2018
@@ -36,3 +37,4 @@ int main(void)
 		}
 	}
 }
+#endif

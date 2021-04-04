@@ -1,7 +1,7 @@
 #include "rtos.h"
 #include <stddef.h>
 #include <stdbool.h>
-#include <cassert>
+#include <assert.h>
 #include "timer.h"
 #include <LPC17xx.h>
 
@@ -11,7 +11,7 @@
 
 #define IDLE_TASK 0
 
-uint32_t initial_sp = *(uint32_t *)0x0;
+static uint32_t initial_sp = *(uint32_t *)0x0;
 
 static uint8_t active_tasks = 0;
 
@@ -28,7 +28,8 @@ typedef struct TCB
 
 static TCB_t tcbs[MAX_THREADS];
 
-TCB_t *active_tcb = NULL, next_tcb = NULL;
+static TCB_t *active_tcb = NULL;
+static TCB_t *next_tcb = NULL;
 
 /* Public Functions */
 void rtos_init(void);
@@ -37,14 +38,14 @@ bool rtos_create_task(tid_t *thread_id, uint8_t priority, rtos_task_func_t task,
 void rtos_task_yield(tid_t id);
 
 /* Private Functions */
-void rtos_idle_task(void *);
+void rtos_idle_task(void *unused);
 __asm void PendSV_Handler(void);
 __asm void rtos_initialize_stack(rtos_task_func_t task, void *args);
 
 void rtos_init(void)
 {
-	NVIC_SetPriority(SysTick_Handler, 0x00);
-	NVIC_SetPriority(PendSV_Handler, 0xFF);
+	NVIC_SetPriority(SysTick_IRQn, 0x00);
+	NVIC_SetPriority(PendSV_IRQn, 0xFF);
 	for (uint8_t i = 0; i < MAX_THREADS; i++)
 	{
 		tcbs[i].id = i;
@@ -57,8 +58,8 @@ void rtos_init(void)
 
 void rtos_start(void)
 {
-	/* At least one task must have been created */
-	assert(tcbs[1].active);
+	/* At least one task (other than idle) must have been created */
+	assert(active_tasks > 1);
 	/* Reset MSP to top of main stack frame */
 	__set_MSP(initial_sp);
 	/* Switch from MSP to PSP and init PSP to idle task stack */
@@ -88,7 +89,7 @@ bool rtos_create_task(tid_t *thread_id, uint8_t priority, rtos_task_func_t task,
 	{
 		active_tasks++;
 		*thread_id = active_tasks;
-		tcbs[thread_id].priority = priority;
+		tcbs[*thread_id].priority = priority;
 		rtos_initialize_stack(task, args);
 		success = true;
 	}
@@ -141,8 +142,9 @@ __asm void PendSV_Handler(void)
 	CPSIE i;
 }
 
-void rtos_idle_task(void *)
+void rtos_idle_task(void *unused)
 {
+	(void)unused;
 	while (true)
 	{
 		__NOP();

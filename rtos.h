@@ -1,5 +1,6 @@
 #ifndef RTOS_H
 #define RTOS_H
+#include <stdbool.h>
 #include <stdint.h>
 
 typedef void (*rtos_task_func_t)(void *args);
