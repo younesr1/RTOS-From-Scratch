@@ -29,8 +29,8 @@ int main(void)
 {
     rtos_init();
     tid_t foo_id, bar_id;
-    assert(rtos_create_task(&foo_id, 5, foo, NULL));
-    assert(rtos_create_task(&bar_id, 10, bar, NULL));
+    assert(rtos_create_task(&foo_id, foo, NULL));
+    assert(rtos_create_task(&bar_id, bar, NULL));
     rtos_start();
     while (true)
     {

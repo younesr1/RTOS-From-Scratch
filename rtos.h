@@ -19,12 +19,11 @@ void rtos_start(void);
 /**
  * @brief Create a task
  * @param thread_id Memory address to store thread_id
- * @param priority Task priority
  * @param task Pointer to task
  * @param args args for task function
  * @return true if successful
  */
-bool rtos_create_task(tid_t *thread_id, uint8_t priority, rtos_task_func_t task, void *args);
+bool rtos_create_task(tid_t *thread_id, rtos_task_func_t task, void *args);
 
 /**
  * @brief Yields to other tasks

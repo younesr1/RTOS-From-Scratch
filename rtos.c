@@ -33,7 +33,7 @@ static uint8_t current_tcb = 0, next_tcb = 0;
 /* Public Functions */
 void rtos_init(void);
 void rtos_start(void);
-bool rtos_create_task(tid_t *thread_id, uint8_t priority, rtos_task_func_t task, void *args);
+bool rtos_create_task(tid_t *thread_id, rtos_task_func_t task, void *args);
 void rtos_task_yield(tid_t id);
 
 /* Private Functions */
@@ -52,7 +52,6 @@ void rtos_init(void)
 	for (uint8_t i = 0; i < MAX_THREADS; i++)
 	{
 		tcbs[i].id = i;
-		tcbs[i].priority = 255;
 		tcbs[i].stack_capacity = MAX_PROCESS_STACK_SIZE;
 		tcbs[i].stack_base = (void *)((initial_sp - MAX_MAIN_STACK_SIZE) - ((MAX_THREADS - i - 1) * MAX_PROCESS_STACK_SIZE));
 		tcbs[i].stack_top = tcbs[i].stack_base;
@@ -75,13 +74,13 @@ void rtos_start(void)
 	__ISB();
 	/* Configure SysTick and call idle task */
 	assert(timer_init(rtos_ticker_callback));
-	active_tcb = IDLE_TASK;
-	next_tcb = active_tcb;
+	current_tcb = IDLE_TASK;
+	next_tcb = current_tcb;
 	active_tasks++;
 	rtos_idle_task(NULL);
 }
 
-bool rtos_create_task(tid_t *thread_id, uint8_t priority, rtos_task_func_t task, void *args)
+bool rtos_create_task(tid_t *thread_id, rtos_task_func_t task, void *args)
 {
 	assert(thread_id != NULL && task != NULL);
 	bool success;
@@ -93,7 +92,6 @@ bool rtos_create_task(tid_t *thread_id, uint8_t priority, rtos_task_func_t task,
 	{
 		active_tasks++;
 		*thread_id = active_tasks;
-		tcbs[*thread_id].priority = priority;
 		rtos_initialize_stack(task, args);
 		success = true;
 	}
@@ -144,10 +142,6 @@ __asm void PendSV_Handler(void)
 	LDMFD R2 !, {R4 - R11};
 	// re-enable interrupts
 	CPSIE i;
-	__cpp
-	{
-		current_tcb = (current_tcb + 1) % active_tasks;
-	}
 	// return from handler
 	BX LR;
 }

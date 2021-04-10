@@ -28,15 +28,16 @@ Project File Date:  04/10/2021
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Target 1'
 compiling rtos.c...
-rtos.c(105): error:  #1266: Operand should be a constant expression
-  	LDR PC,=__cpp(task);
-rtos.c(112): error:  #1266: Operand should be a constant expression
-  	LDR R0,=__cpp(args);
-rtos.c(134): error:  #1266: Operand should be a constant expression
-  	LDR R1, __cpp(active_tcb->stack_top);
-rtos.c(139): error:  #1266: Operand should be a constant expression
-  	LDR R2, __cpp(next_tcb->stack_top);
+rtos.c(104): error:  #1266: Operand should be a constant expression
+  	LDR PC, = __cpp(task);
+rtos.c(111): error:  #1266: Operand should be a constant expression
+  	LDR R0, = __cpp(args);
+rtos.c(133): error:  #1266: Operand should be a constant expression
+  	LDR R1, __cpp(tcbs[current_tcb].stack_top);
+rtos.c(138): error:  #1266: Operand should be a constant expression
+  	LDR R2, __cpp(tcbs[next_tcb].stack_top);
 rtos.c: 0 warnings, 4 errors
+compiling timer.c...
 ".\Objects\MyRTOS.axf" - 4 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>

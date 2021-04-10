@@ -4,10 +4,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+typedef void (*timer_callback_t)(uint32_t);
+
 /**
  * @brief Configure Systick to run every ms
  */
-bool timer_init(void);
+bool timer_init(timer_callback_t cb);
 
 /**
  * @brief Get time elapsed in ms

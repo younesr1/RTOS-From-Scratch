@@ -1,9 +1,8 @@
 #include "timer.h"
+#include <stdlib.h>
 #include "LPC17xx.h"
 
 volatile uint32_t msTicks = 0;
-
-typedef void (*timer_callback_t)(uint32_t);
 
 timer_callback_t tick_cb = NULL;
 
