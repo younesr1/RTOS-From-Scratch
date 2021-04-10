@@ -7,12 +7,12 @@
 /**
  * @brief Configure Systick to run every ms
  */
-bool timer_init();
+bool timer_init(void);
 
 /**
  * @brief Get time elapsed in ms
  * @return Elapsed ms
  */
-uint32_t timer_get_time();
+uint32_t timer_get_time(void);
 
 #endif

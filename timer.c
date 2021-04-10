@@ -3,12 +3,12 @@
 
 volatile uint32_t msTicks = 0;
 
-bool timer_init()
+bool timer_init(void)
 {
     return SysTick_Config(SystemCoreClock / 1000) != 0;
 }
 
-uint32_t timer_get_time()
+uint32_t timer_get_time(void)
 {
     return msTicks;
 }

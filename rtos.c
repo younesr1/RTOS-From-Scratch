@@ -9,9 +9,9 @@
 #define MAX_PROCESS_STACK_SIZE 1024
 #define MAX_MAIN_STACK_SIZE 2048
 
-#define IDLE_TASK 0
+#define PSR_DEFAULT 0x01000000
 
-static uint32_t initial_sp = *(uint32_t *)0x0;
+#define IDLE_TASK 0
 
 static uint8_t active_tasks = 0;
 
@@ -44,6 +44,7 @@ __asm void rtos_initialize_stack(rtos_task_func_t task, void *args);
 
 void rtos_init(void)
 {
+	const uint32_t initial_sp = *(uint32_t *)SCB->VTOR;
 	NVIC_SetPriority(SysTick_IRQn, 0x00);
 	NVIC_SetPriority(PendSV_IRQn, 0xFF);
 	for (uint8_t i = 0; i < MAX_THREADS; i++)
@@ -58,6 +59,7 @@ void rtos_init(void)
 
 void rtos_start(void)
 {
+	const uint32_t initial_sp = *(uint32_t*)SCB->VTOR;
 	/* At least one task (other than idle) must have been created */
 	assert(active_tasks > 1);
 	/* Reset MSP to top of main stack frame */
@@ -96,16 +98,18 @@ bool rtos_create_task(tid_t *thread_id, uint8_t priority, rtos_task_func_t task,
 	return success;
 }
 
-__asm void rtos_initialize_stack(rtos_task_func_t task, void *args)
+__asm void rtos_initialize_stack(const rtos_task_func_t task, void *args)
 {
-	PUSH 0x01000000;
-	PUSH __cpp(task);
+	PUSH PSR_DEFAULT;
+	LDR PC,=__cpp(task);
+	PUSH PC;
 	PUSH LR;
 	PUSH R12;
 	PUSH R3;
 	PUSH R2;
 	PUSH R1;
-	PUSH __cpp(args);
+	LDR R0,=__cpp(args);
+	PUSH R0;
 	PUSH R11;
 	PUSH R10;
 	PUSH R9;
@@ -126,12 +130,12 @@ __asm void PendSV_Handler(void)
 	// copy r4-r11 to process stack
 	STMFD R0 !, {R4 - R11};
 	// store top of stack to global var
-	LDR R1, __cpp(&active_tcb->stack_top);
+	LDR R1, __cpp(active_tcb->stack_top);
 	STR R0, [R1];
 	// allow pipeline to clear before switching stacks
 	ISB;
 	// store top of next stack to R2
-	LDR R2, __cpp(&next_tcb->stack_top);
+	LDR R2, __cpp(next_tcb->stack_top);
 	// update the psp to use new stack
 	MSR PSP, R2;
 	// pop r4-r11 onto the current stack
