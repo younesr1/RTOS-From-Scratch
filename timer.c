@@ -3,8 +3,13 @@
 
 volatile uint32_t msTicks = 0;
 
-bool timer_init(void)
+typedef void (*timer_callback_t)(uint32_t);
+
+timer_callback_t tick_cb = NULL;
+
+bool timer_init(timer_callback_t cb)
 {
+    tick_cb = cb;
     return SysTick_Config(SystemCoreClock / 1000) != 0;
 }
 
@@ -19,10 +24,9 @@ void SysTick_Handler(void)
     /* Must disable interrupts since non re-entrant */
     __disable_irq();
     msTicks++;
-    if (msTicks % 100 == 0)
+    if (tick_cb)
     {
-			// younes todo call fpp here. maybe move this function to rtos.c
-        SCB->ICSR = 0x1 << 28;
+        tick_cb(msTicks);
     }
     __enable_irq();
 }

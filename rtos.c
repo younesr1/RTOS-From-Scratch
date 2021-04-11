@@ -10,6 +10,8 @@
 #define MAX_MAIN_STACK_SIZE 2048
 
 #define PSR_DEFAULT 0x01000000
+#define PENDSV_TRIGGER_BIT 28
+#define SCHEDULER_TICK_PERIOD 100
 
 #define IDLE_TASK 0
 
@@ -18,8 +20,6 @@ static uint8_t active_tasks = 0;
 typedef struct TCB
 {
 	tid_t id;
-	uint8_t priority;
-
 	size_t stack_capacity;
 	void *stack_base;
 	void *stack_top;
@@ -28,8 +28,7 @@ typedef struct TCB
 
 static TCB_t tcbs[MAX_THREADS];
 
-static TCB_t *active_tcb = NULL;
-static TCB_t *next_tcb = NULL;
+static uint8_t current_tcb = 0, next_tcb = 0;
 
 /* Public Functions */
 void rtos_init(void);
@@ -39,6 +38,9 @@ void rtos_task_yield(tid_t id);
 
 /* Private Functions */
 void rtos_idle_task(void *unused);
+void rtos_ticker_callback(uint32_t tick);
+void rtos_run_scheduler(void); //  Pre-emptive round robin
+void rtos_trigger_pendsv(void);
 __asm void PendSV_Handler(void);
 __asm void rtos_initialize_stack(rtos_task_func_t task, void *args);
 
@@ -50,7 +52,7 @@ void rtos_init(void)
 	for (uint8_t i = 0; i < MAX_THREADS; i++)
 	{
 		tcbs[i].id = i;
-		tcbs[i].priority = 0;
+		tcbs[i].priority = 255;
 		tcbs[i].stack_capacity = MAX_PROCESS_STACK_SIZE;
 		tcbs[i].stack_base = (void *)((initial_sp - MAX_MAIN_STACK_SIZE) - ((MAX_THREADS - i - 1) * MAX_PROCESS_STACK_SIZE));
 		tcbs[i].stack_top = tcbs[i].stack_base;
@@ -59,7 +61,7 @@ void rtos_init(void)
 
 void rtos_start(void)
 {
-	const uint32_t initial_sp = *(uint32_t*)SCB->VTOR;
+	const uint32_t initial_sp = *(uint32_t *)SCB->VTOR;
 	/* At least one task (other than idle) must have been created */
 	assert(active_tasks > 1);
 	/* Reset MSP to top of main stack frame */
@@ -72,8 +74,8 @@ void rtos_start(void)
 	/* Ensure pipe is cleared before loading new instructions since stack change */
 	__ISB();
 	/* Configure SysTick and call idle task */
-	assert(timer_init());
-	active_tcb = &tcbs[IDLE_TASK];
+	assert(timer_init(rtos_ticker_callback));
+	active_tcb = IDLE_TASK;
 	next_tcb = active_tcb;
 	active_tasks++;
 	rtos_idle_task(NULL);
@@ -101,14 +103,14 @@ bool rtos_create_task(tid_t *thread_id, uint8_t priority, rtos_task_func_t task,
 __asm void rtos_initialize_stack(const rtos_task_func_t task, void *args)
 {
 	PUSH PSR_DEFAULT;
-	LDR PC,=__cpp(task);
+	LDR PC, = __cpp(task);
 	PUSH PC;
 	PUSH LR;
 	PUSH R12;
 	PUSH R3;
 	PUSH R2;
 	PUSH R1;
-	LDR R0,=__cpp(args);
+	LDR R0, = __cpp(args);
 	PUSH R0;
 	PUSH R11;
 	PUSH R10;
@@ -130,20 +132,24 @@ __asm void PendSV_Handler(void)
 	// copy r4-r11 to process stack
 	STMFD R0 !, {R4 - R11};
 	// store top of stack to global var
-	LDR R1, __cpp(active_tcb->stack_top);
+	LDR R1, __cpp(tcbs[current_tcb].stack_top);
 	STR R0, [R1];
 	// allow pipeline to clear before switching stacks
 	ISB;
 	// store top of next stack to R2
-	LDR R2, __cpp(next_tcb->stack_top);
+	LDR R2, __cpp(tcbs[next_tcb].stack_top);
 	// update the psp to use new stack
 	MSR PSP, R2;
 	// pop r4-r11 onto the current stack
 	LDMFD R2 !, {R4 - R11};
-	// return from handler
-	BX LR;
 	// re-enable interrupts
 	CPSIE i;
+	__cpp
+	{
+		current_tcb = (current_tcb + 1) % active_tasks;
+	}
+	// return from handler
+	BX LR;
 }
 
 void rtos_idle_task(void *unused)
@@ -153,4 +159,23 @@ void rtos_idle_task(void *unused)
 	{
 		__NOP();
 	}
+}
+
+void rtos_ticker_callback(uint32_t tick)
+{
+	if (tick % SCHEDULER_TICK_PERIOD == 0)
+	{
+		rtos_run_scheduler();
+		rtos_trigger_pendsv();
+	}
+}
+
+void rtos_trigger_pendsv(void)
+{
+	SCB->ICSR = 0x1 >> PENDSV_TRIGGER_BIT;
+}
+
+void rtos_run_scheduler(void)
+{
+	next_tcb = (next_tcb + 1) % active_tasks;
 }
